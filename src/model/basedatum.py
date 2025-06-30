@@ -1,4 +1,5 @@
 import os
+import sys
 import glob
 import logging
 from datetime import datetime as dt
@@ -6,6 +7,10 @@ from datetime import timezone as tz
 
 from pydantic import BaseModel, ValidationError
 from typing import ClassVar
+
+current_dir = os.path.dirname(os.path.realpath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.insert(0, parent_dir)
 
 logger = logging.getLogger(__name__)
 
