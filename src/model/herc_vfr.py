@@ -17,6 +17,12 @@ logger = logging.getLogger(__name__)
 
 class HercVFRDatum(BaseDatum):
 
+    # Human readable name of this class. Pydantic sets the 
+    # __class__.__name__ attribute to ModelMetaclass which is great
+    # for pydantic, but then we can't use it in log messages and
+    # so forth...
+    modelname: ClassVar[str] = 'HercVFRDatum'
+
     # parameters that we'll need to actually find all of the files
     # in this "series" of data. Note these need to be marked as 
     # ClassVar[str] so that pydantic doesn't interpret them as model 

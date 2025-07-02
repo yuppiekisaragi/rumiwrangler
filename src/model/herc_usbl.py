@@ -18,6 +18,12 @@ logger = logging.getLogger(__name__)
 
 class HercUSBLDatum(BaseDatum):
 
+    # Human readable name of this class. Pydantic sets the 
+    # __class__.__name__ attribute to ModelMetaclass which is great
+    # for pydantic, but then we can't use it in log messages and
+    # so forth...
+    modelname: ClassVar[str] = 'HercUSBLDatum'
+
     # parameters that we'll need to actually find all of the files
     # in this "series" of data. Note these need to be marked as 
     # ClassVar[str] so that pydantic doesn't interpret them as model 
@@ -87,8 +93,3 @@ class HercUSBLDatum(BaseDatum):
         except IndexError as e:
             raise ValueError('$GPGGA regex missing fields: {e}')
         return parsed
-
-if __name__ == '__main__':
-
-    for datum in HercUSBLDatum.iter_data('/mnt/nautilusfs/data/NA171'):
-        print(datum)

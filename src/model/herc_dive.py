@@ -5,7 +5,7 @@ from datetime import datetime as dt
 from datetime import timezone as tz
 
 from pydantic import ValidationError
-from typing import ClassVar
+from typing import ClassVar, Optional
 
 current_dir = os.path.dirname(os.path.realpath(__file__))
 parent_dir = os.path.dirname(current_dir)
@@ -16,6 +16,12 @@ from model.basedatum import BaseDatum
 logger = logging.getLogger(__name__)
 
 class HercDiveDatum(BaseDatum):
+
+    # Human readable name of this class. Pydantic sets the 
+    # __class__.__name__ attribute to ModelMetaclass which is great
+    # for pydantic, but then we can't use it in log messages and
+    # so forth...
+    modelname : ClassVar[str] = 'HercDiveDatum'
 
     # parameters that we'll need to actually find all of the files
     # in this "series" of data. Note these need to be marked as 
@@ -32,9 +38,9 @@ class HercDiveDatum(BaseDatum):
     dive: str
     site: str
     inwater: dt	
-    onbottom: dt	
-    offbottom: dt	
-    ondeck: dt
+    onbottom: Optional[dt]
+    offbottom: Optional[dt]
+    ondeck: Optional[dt]
 
     @classmethod
     def parse_line(cls, line, filename=''):
@@ -44,18 +50,40 @@ class HercDiveDatum(BaseDatum):
 
         try:
             parsed['dive'] = sline[0]
+        except IndexError:
+            raise ValueError('cannot parse field 0, dive')
+        try:
             parsed['site'] = sline[1].replace('_', ' ')
+        except IndexError:
+            raise ValueError('cannot parse field 1, site')
+        try:
             parsed['inwater'] = sline[2]
+        except IndexError:
+            raise ValueError('cannot parse field 2, inwater')
+        try:
             parsed['onbottom'] = sline[3]
+        except IndexError:
+            raise ValueError('cannot parse field 3, onbottom')
+        try:
             parsed['offbottom'] = sline[4]
+        except IndexError:
+            #offbottom is None for dives that are still happening
+            parsed['offbottom'] = None
+        try:
             parsed['ondeck'] = sline[5]
-
-        except IndexError as e:
-            raise ValueError(e)
+        except IndexError:
+            parsed['ondeck'] = None
+            #ondeck is None for dives that are still happening
 
         return parsed
 
 class HercDiveStatsDatum(BaseDatum):
+
+    # Human readable name of this class. Pydantic sets the 
+    # __class__.__name__ attribute to ModelMetaclass which is great
+    # for pydantic, but then we can't use it in log messages and
+    # so forth...
+    modelname : ClassVar[str] = 'HercDiveStatsDatum'
 
     # parameters that we'll need to actually find all of the files
     # in this "series" of data. Note these need to be marked as 
@@ -120,6 +148,12 @@ class HercDiveStatsDatum(BaseDatum):
 
 class HercDiveSummaryDatum(BaseDatum):
 
+    # Human readable name of this class. Pydantic sets the 
+    # __class__.__name__ attribute to ModelMetaclass which is great
+    # for pydantic, but then we can't use it in log messages and
+    # so forth...
+    modelname : ClassVar[str] = 'HercDiveSummaryDatum'
+
     # parameters that we'll need to actually find all of the files
     # in this "series" of data. Note these need to be marked as 
     # ClassVar[str] so that pydantic doesn't interpret them as model 
@@ -131,10 +165,3 @@ class HercDiveSummaryDatum(BaseDatum):
     encoding : ClassVar[str] = 'latin-1'
 
     # Now, we have all of the Pydantic model attributes.
-
-if __name__ == '__main__':
-
-    for datum in HercDiveDatum.iter_data('/mnt/nautilusfs/data/NA171'):
-        print(datum)
-    for datum in HercDiveStatsDatum.iter_data('/mnt/nautilusfs/data/NA171'):
-        print(datum)

@@ -16,6 +16,17 @@ logger = logging.getLogger(__name__)
 
 class BaseDatum(BaseModel):
 
+    # Human readable name of this class. Pydantic sets the 
+    # __class__.__name__ attribute to ModelMetaclass which is great
+    # for pydantic, but then we can't use it in log messages and
+    # so forth...
+    modelname: ClassVar[str] = 'BaseDatum'
+
+    # Lambda expression used to select the winning datum when sorting
+    # them into 1Hz bins. The simplest approach is just to pick the 
+    # datum closest to microsecond=0.
+    bin_sort_lambda = (lambda d: d.raw_ts.microsecond)
+
     # parameters that we'll need to actually find all of the files
     # in this "series" of data. Note these need to be marked as 
     # ClassVar[str] so that pydantic doesn't interpret them as model 
@@ -49,10 +60,10 @@ class BaseDatum(BaseModel):
         data_files = cls.get_data_files(basepath)
         for data_file in data_files:
             fileline = 0
+            filename = os.path.basename(data_file)
             with open(data_file, 'r', encoding='latin-1') as data_fh:
                 for line in data_fh:
                     line = line.strip()
-                    filename = os.path.basename(data_file)
                     fileline += 1
                     errloc = f'{filename},{fileline}'
 
@@ -69,16 +80,18 @@ class BaseDatum(BaseModel):
                     try:
                         parsed = cls.parse_line(line, filename=filename)
                     except ValueError as e:
-                        err = f'{errloc}: parse {line}: {e}'
+                        err = f'{errloc}: cannot parse as {cls.modelname}:\n'
+                        err += f'{line}'
                         logger.error(err)
-                        continue
+                        continue 
 
                     try:
                         model = cls(**parsed)
                     except ValidationError as e:
-                        err = f'{errloc}: validate {line}: {e}\n'
-                        err += f'model: {cls.__name__}\n'
-                        err += f'{parsed}'
+                        err = f'{errloc}: cannot validate as {cls.modelname}\n'
+                        err += f'{line}: {e}\n'
+                        err += f'{parsed}\n'
+                        err += f'Exception {e.__class__}: {str(e)}'
                         logger.error(err)
                         continue
 

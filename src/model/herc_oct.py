@@ -17,6 +17,12 @@ logger = logging.getLogger(__name__)
 
 class HercOCTDatum(BaseDatum):
 
+    # Human readable name of this class. Pydantic sets the 
+    # __class__.__name__ attribute to ModelMetaclass which is great
+    # for pydantic, but then we can't use it in log messages and
+    # so forth...
+    modelname: ClassVar[str] = 'HercOCTDatum'
+
     # parameters that we'll need to actually find all of the files
     # in this "series" of data. Note these need to be marked as 
     # ClassVar[str] so that pydantic doesn't interpret them as model 
@@ -46,6 +52,9 @@ class HercOCTDatum(BaseDatum):
             parsed['roll'] = sline[9]
         except IndexError as e:
             raise ValueError(e)
+        except Exception as e:
+            err = f'{e.__name__}: {str(e)}'
+            raise ValueError(err)
 
         return parsed
 
