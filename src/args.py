@@ -43,9 +43,11 @@ def parse_cli_args():
 
     #options to manage list of dives
     parser.add_argument('cruise')
+    parser.add_argument('command')
     parser.add_argument('--skip', action='append')
     parser.add_argument('--only', action='append')
     parser.add_argument('--cruise-location', default=CRUISE_LOCATION)
+    parser.add_argument('--db-location', default=os.getcwd())
 
     #options to manage logging
     parser.add_argument('--debug', action='store_true')

@@ -4,13 +4,18 @@ import logging
 
 from args import parse_cli_args
 from getdivelist import get_selected_dives
-from getdivedata import get_dive_data
-from model.herc_dive import HercDiveDatum
-from model.herc_oct import HercOCTDatum
-from model.herc_vfr import HercVFRDatum
+#from getdivedata import get_dive_data
+#from model.herc_dive import HercDiveDatum
+#from model.herc_oct import HercOCTDatum
+#from model.herc_vfr import HercVFRDatum
+from log.debug import debug_args
+from command.importraw import ImportRawCommand
 
 logger = logging.getLogger()
 
+#setup dictionary of command-class mapping
+commanddict = {}
+commanddict['importraw'] = ImportRawCommand
 
 if __name__ == '__main__':
 
@@ -22,10 +27,12 @@ if __name__ == '__main__':
 
     if args.debug:
         logger.setLevel(logging.DEBUG)
+        logger.debug(debug_args(args))
     elif args.verbose:
         logger.setLevel(logging.INFO)
     else:
         logger.setLevel(logging.WARNING)
+
 
     cruisepath = os.path.join(args.cruise_location, args.cruise)
     dives = get_selected_dives(cruisepath, 
@@ -40,7 +47,14 @@ if __name__ == '__main__':
         logger.info(f'onbottom: {dive.onbottom}')
         logger.info(f'offbottom: {dive.offbottom}')
         logger.info(f'ondeck: {dive.ondeck}')
-        get_dive_data(cruisepath, 
-                dive, 
-                start_ts=args.start_ts, 
-                end_ts=args.end_ts) 
+        try:
+            cmdclass = commanddict[args.command]
+            cmd = cmdclass(args, 
+                    cruisepath, 
+                    dive, 
+                    start_ts=args.start_ts,
+                    end_ts=args.end_ts)
+            cmd.execute()
+        except Exception as e:
+            logger.error(f'{e.__class__}: {str(e)}')
+            sys.exit(1)
