@@ -104,3 +104,11 @@ class BaseDatum(BaseModel):
         if 'id' in modeldict:
             modeldict.pop('id')
         return ormclass(**modeldict)
+
+    @classmethod
+    def from_orm(cls, ormdict):
+        if '_sa_instance_state' in ormdict:
+            ormdict.pop('_sa_instance_state')
+        if 'id' in ormdict:
+            ormdict.pop('id')
+        return cls(**ormdict)

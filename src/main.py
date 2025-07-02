@@ -6,12 +6,14 @@ from args import parse_cli_args
 from getdivelist import get_selected_dives
 from log.debug import debug_args
 from command.importraw import ImportRawCommand
+from command.selectoct import SelectOCTCommand
 
 logger = logging.getLogger()
 
 #setup dictionary of command-class mapping
 commanddict = {}
 commanddict['importraw'] = ImportRawCommand
+commanddict['selectoct'] = SelectOCTCommand
 
 if __name__ == '__main__':
 

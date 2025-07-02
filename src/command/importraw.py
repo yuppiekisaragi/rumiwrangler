@@ -46,6 +46,10 @@ class ImportRawCommand(BaseCommand):
             elif (not et) or (datum.raw_ts < et):
                 #not et - means we're in the current dive
                 #defined et - we're in the middle of a complete dive
+                #ensure that dive is defined. note that self. dive
+                #is a metadata object, in this case we just want the
+                #str name of the dive.
+                datum.dive = self.dive.dive
                 dataset.append(datum)
             elif et and datum.raw_ts > et:
                 #we've hit the end of the window, stop iterating.
