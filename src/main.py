@@ -4,10 +4,6 @@ import logging
 
 from args import parse_cli_args
 from getdivelist import get_selected_dives
-#from getdivedata import get_dive_data
-#from model.herc_dive import HercDiveDatum
-#from model.herc_oct import HercOCTDatum
-#from model.herc_vfr import HercVFRDatum
 from log.debug import debug_args
 from command.importraw import ImportRawCommand
 
@@ -50,7 +46,7 @@ if __name__ == '__main__':
         try:
             cmdclass = commanddict[args.command]
             cmd = cmdclass(args, 
-                    cruisepath, 
+                    args.cruise, 
                     dive, 
                     start_ts=args.start_ts,
                     end_ts=args.end_ts)

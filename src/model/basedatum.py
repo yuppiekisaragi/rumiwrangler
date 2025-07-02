@@ -99,4 +99,8 @@ class BaseDatum(BaseModel):
                         model.raw_ts = model.raw_ts.replace(tzinfo=tz.utc)
                     yield model
 
-
+    def to_orm(self, ormclass):
+        modeldict = self.model_dump()
+        if 'id' in modeldict:
+            modeldict.pop('id')
+        return ormclass(**modeldict)

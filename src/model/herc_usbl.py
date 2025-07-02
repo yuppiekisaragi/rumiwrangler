@@ -6,7 +6,9 @@ from datetime import datetime as dt
 from datetime import timezone as tz
 
 from pydantic import ValidationError
-from typing import ClassVar
+from typing import ClassVar, Optional
+from sqlalchemy import Column, Integer, Float, String, DateTime
+from sqlalchemy.ext.declarative import declarative_base
 
 current_dir = os.path.dirname(os.path.realpath(__file__))
 parent_dir = os.path.dirname(current_dir)
@@ -36,7 +38,9 @@ class HercUSBLDatum(BaseDatum):
 
     # Now, we have all of the Pydantic model attributes.
 
+    dive : Optional[str] = ''
     raw_ts : dt
+    ts : Optional[dt] = None
     latitude : float
     longitude : float
     accuracy : float
@@ -93,3 +97,19 @@ class HercUSBLDatum(BaseDatum):
         except IndexError as e:
             raise ValueError('$GPGGA regex missing fields: {e}')
         return parsed
+
+Base = declarative_base()
+class HercUSBLORM(Base):
+
+    __tablename__ = HercUSBLDatum.modelname
+
+    id = Column(Integer, primary_key=True)
+    dive = Column(String)
+    raw_ts = Column(DateTime)
+    ts = Column(DateTime, nullable=True)
+    latitude = Column(Float)
+    longitude = Column(Float)
+    accuracy = Column(Float)
+    depth = Column(Float)
+    beacon = Column(Integer)
+    checksum = Column(String)

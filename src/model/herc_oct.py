@@ -5,7 +5,9 @@ from datetime import datetime as dt
 from datetime import timezone as tz
 
 from pydantic import ValidationError
-from typing import ClassVar
+from typing import ClassVar, Optional
+from sqlalchemy import Column, Integer, Float, String, DateTime
+from sqlalchemy.ext.declarative import declarative_base
 
 current_dir = os.path.dirname(os.path.realpath(__file__))
 parent_dir = os.path.dirname(current_dir)
@@ -35,7 +37,9 @@ class HercOCTDatum(BaseDatum):
 
     # Now, we have all of the Pydantic model attributes.
 
+    dive : Optional[str] = ''
     raw_ts : dt
+    ts : Optional[dt] = None
     heading : float
     pitch : float
     roll : float
@@ -58,7 +62,15 @@ class HercOCTDatum(BaseDatum):
 
         return parsed
 
-if __name__ == '__main__':
-    for datum in HercOCTDatum.iter_data('/mnt/nautilusfs/data/NA171'):
-        print(datum)
+Base = declarative_base()
+class HercOCTORM(Base):
 
+    __tablename__ = HercOCTDatum.modelname
+
+    id = Column(Integer, primary_key=True)
+    dive = Column(String)
+    raw_ts = Column(DateTime)
+    ts = Column(DateTime, nullable=True)
+    heading = Column(Float)
+    pitch = Column(Float)
+    roll = Column(Float)
