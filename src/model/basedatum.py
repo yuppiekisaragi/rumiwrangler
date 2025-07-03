@@ -6,7 +6,7 @@ from datetime import datetime as dt
 from datetime import timezone as tz
 
 from pydantic import BaseModel, ValidationError
-from typing import ClassVar
+from typing import ClassVar, Optional
 
 current_dir = os.path.dirname(os.path.realpath(__file__))
 parent_dir = os.path.dirname(current_dir)
@@ -38,10 +38,10 @@ class BaseDatum(BaseModel):
     encoding : ClassVar[str] = 'utf-8'
     assume_utc : ClassVar[bool] = True
 
-    # There are no model attributes defined on BaseDatum. This primarily
-    # exists to contain the basic classmethods (get all files from glob,
-    # factory function to return a model instance for each line in the glob,
-    # et cetera). 
+    #this is dropped going from Pydantic -> ORM, but we keep it
+    #in the model when going from ORM -> Pydantic -> do stuff -> update DB
+
+    id : Optional[int] = 0
 
     @classmethod
     def get_data_files(cls, basepath):
@@ -109,6 +109,10 @@ class BaseDatum(BaseModel):
     def from_orm(cls, ormdict):
         if '_sa_instance_state' in ormdict:
             ormdict.pop('_sa_instance_state')
-        if 'id' in ormdict:
-            ormdict.pop('id')
+        #We actually do want id when going from ORM -> Pydantic.
+        #When rows are getting pulled from the db back into Pydantic
+        #models, having id since nice, since it makes db updates very
+        #simple.
+        #if 'id' in ormdict:
+        #    ormdict.pop('id')
         return cls(**ormdict)
