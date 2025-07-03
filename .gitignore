@@ -1,5 +1,15 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
+# Ignore sqlite db instances
+**/*.db
+
+# Ignore things under the src/ directory
+src/bin/
+src/lib/
+src/lib64
+src/include
+src/pyvenv.cfg
+
+## Byte-compiled / optimized / DLL files
+**/__pycache__/
 *.py[cod]
 *$py.class
 
@@ -11,11 +21,13 @@ __pycache__/
 build/
 develop-eggs/
 dist/
+include/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
+**/lib/
+**/lib64/
+**/bin/
 parts/
 sdist/
 var/
