@@ -2,34 +2,21 @@ import os
 import sys
 import logging
 
-from sqlalchemy.engine import reflection
-
 current_dir = os.path.dirname(os.path.realpath(__file__))
 parent_dir = os.path.dirname(current_dir)
 sys.path.insert(0, parent_dir)
 
 from command.base import BaseCommand
-from model.lookup import raw_model_classes, raw_model_ormclasses
+from model.lookup import (model_classes, 
+        model_ormclasses,
+        raw_model_names)
 
 logger = logging.getLogger(__name__)
 
 class ImportRawCommand(BaseCommand):
 
-    def _setup_raw_table(self, raw_model_name):
-
-        logger.info(f'_setup_raw_table {raw_model_name}')
-        raw_model_ormclass = raw_model_ormclasses[raw_model_name]
-        inspect = reflection.Inspector.from_engine(self._engine)
-        #ignore checking schema at first
-        if not inspect.has_table(raw_model_name, None):
-            logger.info(f'creating table {raw_model_name}')
-            #create table, only if it doesn't exist
-            raw_model_ormclass.metadata.create_all(self._engine)
-        else:
-            logger.debug(f'{raw_model_name}: exists')
-
-    def _get_dive_dataset(self, raw_model_name):
-        raw_model_class = raw_model_classes[raw_model_name]
+    def _get_dive_dataset(self, model_name):
+        model_class = model_classes[model_name]
         if self.start_ts and self.end_ts:
             st = start_ts
             et = end_ts
@@ -38,7 +25,7 @@ class ImportRawCommand(BaseCommand):
             et = self.dive.offbottom
 
         dataset = []
-        for datum in raw_model_class.iter_data(self.cruisepath):
+        for datum in model_class.iter_data(self.cruisepath):
             #if it's before the start time, skip it, but keep
             #iterating
             if datum.raw_ts < st:
@@ -60,10 +47,9 @@ class ImportRawCommand(BaseCommand):
         
 
     def target(self):
-        raw_model_names = [k for k in raw_model_classes.keys()]
         for raw_model_name in raw_model_names:
             logger.info(raw_model_name)
-            self._setup_raw_table(raw_model_name)
+            self._setup_table(raw_model_name)
 
             #parse everything and summarize info
             dataset = self._get_dive_dataset(raw_model_name)
@@ -73,7 +59,7 @@ class ImportRawCommand(BaseCommand):
             logger.info(f'last timestamp: {dataset[-1].raw_ts}')
 
             #set up ORM models so we can put it in the db
-            raw_model_ormclass = raw_model_ormclasses[raw_model_name]
-            datasetorm = [d.to_orm(raw_model_ormclass) for d in dataset]
+            model_ormclass = model_ormclasses[raw_model_name]
+            datasetorm = [d.to_orm(model_ormclass) for d in dataset]
             self._db_session.add_all(datasetorm)
             self._db_session.commit()

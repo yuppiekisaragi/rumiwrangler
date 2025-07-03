@@ -9,14 +9,17 @@ from model.herc_oct import HercOCTDatum, HercOCTORM
 from model.herc_usbl import HercUSBLDatum, HercUSBLORM
 from model.herc_vfr import HercVFRDatum, HercVFRORM
 
-raw_model_classes = {
+model_classes = {
         HercOCTDatum.modelname:HercOCTDatum,
         HercUSBLDatum.modelname:HercUSBLDatum,
         HercVFRDatum.modelname:HercVFRDatum}
 
-raw_model_ormclasses = {
+model_ormclasses = {
         HercOCTDatum.modelname:HercOCTORM,
         HercUSBLDatum.modelname:HercUSBLORM,
         HercVFRDatum.modelname:HercVFRORM}
 
-
+raw_model_names = [
+        HercOCTDatum.modelname,
+        HercUSBLDatum.modelname,
+        HercVFRDatum.modelname]

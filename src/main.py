@@ -7,6 +7,7 @@ from getdivelist import get_selected_dives
 from log.debug import debug_args
 from command.importraw import ImportRawCommand
 from command.selectoct import SelectOCTCommand
+from command.selectvfr import SelectVFRCommand
 
 logger = logging.getLogger()
 
@@ -14,6 +15,7 @@ logger = logging.getLogger()
 commanddict = {}
 commanddict['importraw'] = ImportRawCommand
 commanddict['selectoct'] = SelectOCTCommand
+commanddict['selectvfr'] = SelectVFRCommand
 
 if __name__ == '__main__':
 
@@ -53,6 +55,8 @@ if __name__ == '__main__':
                     start_ts=args.start_ts,
                     end_ts=args.end_ts)
             cmd.execute()
-        except Exception as e:
+
+        #except Exception as e:
+        except NotImplementedError as e:
             logger.error(f'{e.__class__}: {str(e)}')
             sys.exit(1)
