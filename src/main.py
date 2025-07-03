@@ -8,6 +8,7 @@ from log.debug import debug_args
 from command.importraw import ImportRawCommand
 from command.selectoct import SelectOCTCommand
 from command.selectvfr import SelectVFRCommand
+from command.selectusbl import SelectUSBLCommand
 
 logger = logging.getLogger()
 
@@ -16,6 +17,7 @@ commanddict = {}
 commanddict['importraw'] = ImportRawCommand
 commanddict['selectoct'] = SelectOCTCommand
 commanddict['selectvfr'] = SelectVFRCommand
+commanddict['selectusbl'] = SelectUSBLCommand
 
 if __name__ == '__main__':
 
