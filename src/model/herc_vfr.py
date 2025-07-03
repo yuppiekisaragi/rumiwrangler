@@ -42,8 +42,8 @@ class HercVFRDatum(BaseDatum):
     ts : Optional[dt] = None
     vehicle : int
     fix : str
-    latitude : float
-    longitude : float
+    vfrlatitude : float
+    vfrlongitude : float
 
     @classmethod
     def parse_line(cls, line, filename=''):
@@ -54,8 +54,8 @@ class HercVFRDatum(BaseDatum):
             parsed['raw_ts'] = sline[1].replace('/', '-') + 'T' + sline[2]
             parsed['vehicle'] = sline[4]
             parsed['fix'] = sline[5]
-            parsed['latitude'] = sline[9]
-            parsed['longitude'] = sline[9]
+            parsed['vfrlatitude'] = sline[9]
+            parsed['vfrlongitude'] = sline[9]
         except IndexError as e:
             raise ValueError(e)
 
@@ -72,6 +72,6 @@ class HercVFRORM(Base):
     ts = Column(DateTime, nullable=True)
     vehicle = Column(Integer)
     fix = Column(String)
-    latitude = Column(Float)
-    longitude = Column(Float)
+    vfrlatitude = Column(Float)
+    vfrlongitude = Column(Float)
 

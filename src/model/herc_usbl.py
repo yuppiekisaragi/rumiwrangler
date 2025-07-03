@@ -41,10 +41,10 @@ class HercUSBLDatum(BaseDatum):
     dive : Optional[str] = ''
     raw_ts : dt
     ts : Optional[dt] = None
-    latitude : float
-    longitude : float
+    usbllatitude : float
+    usbllongitude : float
     accuracy : float
-    depth : float
+    usbldepth : float
     beacon : int
     checksum : str
 
@@ -60,7 +60,6 @@ class HercUSBLDatum(BaseDatum):
 
     @classmethod
     def parse_line(cls, line, filename=''):
-        sline = list(s for s in line.split(' ') if s)
         parsed = {}
 
         # for filename, we only care about the year/month/day, which
@@ -86,10 +85,10 @@ class HercUSBLDatum(BaseDatum):
             d = dt.strptime(filename, '%Y%m%d')
             t = dt.strptime(groups[0], '%H%M%S.%f')
             parsed['raw_ts'] = dt.combine(d.date(), t.time())
-            parsed['latitude'] = cls.nmea2deg(*groups[1:4])
-            parsed['longitude'] = cls.nmea2deg(*groups[4:7])
+            parsed['usbllatitude'] = cls.nmea2deg(*groups[1:4])
+            parsed['usbllongitude'] = cls.nmea2deg(*groups[4:7])
             parsed['accuracy'] = float(groups[7])
-            parsed['depth'] = float(groups[8])
+            parsed['usbldepth'] = float(groups[8])
             parsed['beacon'] = int(groups[9])
             parsed['checksum'] = groups[10]
         except AttributeError as e:
@@ -107,9 +106,9 @@ class HercUSBLORM(Base):
     dive = Column(String)
     raw_ts = Column(DateTime)
     ts = Column(DateTime, nullable=True)
-    latitude = Column(Float)
-    longitude = Column(Float)
+    usbllatitude = Column(Float)
+    usbllongitude = Column(Float)
     accuracy = Column(Float)
-    depth = Column(Float)
+    usbldepth = Column(Float)
     beacon = Column(Integer)
     checksum = Column(String)

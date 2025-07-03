@@ -40,9 +40,9 @@ class HercOCTDatum(BaseDatum):
     dive : Optional[str] = ''
     raw_ts : dt
     ts : Optional[dt] = None
-    heading : float
-    pitch : float
-    roll : float
+    octheading : float
+    octpitch : float
+    octroll : float
 
     @classmethod
     def parse_line(cls, line, filename=''):
@@ -51,9 +51,9 @@ class HercOCTDatum(BaseDatum):
 
         try:
             parsed['raw_ts'] = sline[1].replace('/', '-') + 'T' + sline[2]
-            parsed['heading'] = sline[7]
-            parsed['pitch'] = sline[8]
-            parsed['roll'] = sline[9]
+            parsed['octheading'] = sline[7]
+            parsed['octpitch'] = sline[8]
+            parsed['octroll'] = sline[9]
         except IndexError as e:
             raise ValueError(e)
         except Exception as e:
@@ -71,6 +71,6 @@ class HercOCTORM(Base):
     dive = Column(String)
     raw_ts = Column(DateTime)
     ts = Column(DateTime, nullable=True)
-    heading = Column(Float)
-    pitch = Column(Float)
-    roll = Column(Float)
+    octheading = Column(Float)
+    octpitch = Column(Float)
+    octroll = Column(Float)
