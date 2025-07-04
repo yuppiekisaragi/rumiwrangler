@@ -22,9 +22,8 @@ model_ormclasses = {
         HercUSBLDatum.modelname:HercUSBLORM,
         HercVFRDatum.modelname:HercVFRORM}
 
-#raw_model_names = [
-        #HercOCTDatum.modelname,
-        #HercParoDatum.modelname,
-        #HercUSBLDatum.modelname,
-        #HercVFRDatum.modelname]
-raw_model_names = [HercParoDatum.modelname]
+raw_model_names = [
+        HercOCTDatum.modelname,
+        HercParoDatum.modelname,
+        HercUSBLDatum.modelname,
+        HercVFRDatum.modelname]

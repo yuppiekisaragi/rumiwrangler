@@ -83,7 +83,7 @@ class BaseDatum(BaseModel):
                     #elif cls.prefix and not line.startswith(cls.prefix):
                     elif cls.prefix and cls.prefixindex == 0:
                         if not line.startswith(cls.prefix):
-                            logger.debug(f'{errloc} skipping non-matching prefix')
+                            #logger.debug(f'{errloc} skipping non-matching prefix')
                             continue
                     elif cls.prefix and cls.prefixindex > 0:
                         sline = [l for l in line.split() if l]

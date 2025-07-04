@@ -25,11 +25,9 @@ class BaseCommand():
         self.args = args
         self.cruise = cruise
         cpath = os.path.join(self.args.cruise_location, cruise)
-        logger.debug(f'cpath: {cpath}')
         self.cruisepath = cpath
         #dbpath = os.path.join(self.args.db_location, f'{cruise}.db')
         dburl = f'sqlite:///./{self.cruise}.db'
-        logger.debug(f'dburl: {dburl}')
         self.dburl = dburl 
         self.dive = dive
         self.start_ts = start_ts
@@ -46,7 +44,6 @@ class BaseCommand():
             #create table, only if it doesn't exist
             model_ormclass.metadata.create_all(self._engine)
         else:
-            logger.debug(f'{model_name}: exists')
     #create
     def _insert_rows(self, model_name):
         pass

@@ -1,6 +1,7 @@
 import os
 import sys
 import logging
+import statistics
 
 current_dir = os.path.dirname(os.path.realpath(__file__))
 parent_dir = os.path.dirname(current_dir)
@@ -21,45 +22,27 @@ class SelectUSBLCommand(BaseCommand):
 
     def target(self):
         raw_models = self._select_rows(HercUSBLDatum.modelname)
-        rawdata_1s = []
-
-        bin_ts = last_bin_ts = None
-        bin_data = []
-
-        for i, raw in enumerate(raw_models):
-
-            this_ts = drop_us(raw.raw_ts)
-            if not bin_ts:
-                bin_ts = last_bin_ts = this_ts
-            if this_ts == bin_ts:
-                #keep appending to the current bin
-                bin_data.append(raw)
-
-            else:
-                #take the best accuracy reading from this bin
-                bin_data.sort(key = (lambda d:d.accuracy))
-                if bin_data[0].accuracy == bin_data[-1].accuracy:
-                    #resort for most consistent time interval between
-                    #samples.
-                    resort = (lambda d:get_us(d.raw_ts) - get_us(last_bin_ts))
-                    bin_data.sort(key = resort)
-                bin_data[0].ts = this_ts
-                rawdata_1s.append(bin_data[0])
+        picked_models = []
    
-                try:
-                    #reset the bin
-                    last_bin_ts = this_ts
-                    bin_ts = drop_us(raw_models[i+1].raw_ts)
-                    bin_data = []
-                except IndexError:
-                    #we're at the end, so nothing to advance
-                    pass
+        #only pick data where beacon==1 (Herc). This dataset is only recorded
+        #on a 3-second interval, so we don't need to do anything special to
+        #decimate it down to a 1Hz interval.
+        herc_models = [m for m in raw_models if m.beacon==1]
+        for herc_model in herc_models:
+            #drop off the microsecond
+            this_ts = drop_us(herc_model.raw_ts)
+
+            #always save the first model, then save models which are 
+            #in a new time bin.
+            if not picked_models or (this_ts > picked_models[-1].ts):
+                herc_model.ts = this_ts
+                picked_models.append(herc_model)
 
         update_dicts = []
-        for raw in rawdata_1s:
+        for picked_model in picked_models:
             update_dict = {}
-            update_dict['id'] = raw.id
-            update_dict['ts'] = raw.ts
+            update_dict['id'] = picked_model.id
+            update_dict['ts'] = picked_model.ts
             update_dicts.append(update_dict)
 
         self._update_rows(HercUSBLDatum.modelname, update_dicts)
