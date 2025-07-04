@@ -7,6 +7,7 @@ from getdivelist import get_selected_dives
 from log.debug import debug_args
 from command.importraw import ImportRawCommand
 from command.selectoct import SelectOCTCommand
+from command.selectparo import SelectParoCommand
 from command.selectvfr import SelectVFRCommand
 from command.selectusbl import SelectUSBLCommand
 
@@ -16,6 +17,7 @@ logger = logging.getLogger()
 commanddict = {}
 commanddict['importraw'] = ImportRawCommand
 commanddict['selectoct'] = SelectOCTCommand
+commanddict['selectparo'] = SelectParoCommand
 commanddict['selectvfr'] = SelectVFRCommand
 commanddict['selectusbl'] = SelectUSBLCommand
 

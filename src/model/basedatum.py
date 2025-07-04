@@ -35,6 +35,7 @@ class BaseDatum(BaseModel):
 
     glob : ClassVar[str] = ''
     prefix : ClassVar[str] = ''
+    prefixindex: ClassVar[int] = 0
     encoding : ClassVar[str] = 'utf-8'
     assume_utc : ClassVar[bool] = True
 
@@ -73,10 +74,27 @@ class BaseDatum(BaseModel):
                     elif line.startswith('#'):
                         #logger.debug(f'{errloc} skipping comment line')
                         continue
-                    elif cls.prefix and not line.startswith(cls.prefix):
-                        #logger.debug(f'{errloc} skipping non-matching prefix')
-                        continue
+                    
+                    #check prefix
+                    if not cls.prefix:
+                        #if no prefix has been defined, don't attempt to
+                        #look for it
+                        pass
+                    #elif cls.prefix and not line.startswith(cls.prefix):
+                    elif cls.prefix and cls.prefixindex == 0:
+                        if not line.startswith(cls.prefix):
+                            logger.debug(f'{errloc} skipping non-matching prefix')
+                            continue
+                    elif cls.prefix and cls.prefixindex > 0:
+                        sline = [l for l in line.split() if l]
+                        try:
+                            thisprefix = sline[cls.prefixindex]
+                        except IndexError:
+                            thisprefix = ''
+                        if thisprefix != cls.prefix:
+                                continue
 
+                    #logger.debug(line)
                     try:
                         parsed = cls.parse_line(line, filename=filename)
                     except ValueError as e:
