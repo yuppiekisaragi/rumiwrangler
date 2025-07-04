@@ -43,7 +43,7 @@ class BaseCommand():
             logger.info(f'creating table {model_name}')
             #create table, only if it doesn't exist
             model_ormclass.metadata.create_all(self._engine)
-        else:
+
     #create
     def _insert_rows(self, model_name):
         pass
